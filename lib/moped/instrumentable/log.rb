@@ -24,18 +24,13 @@ module Moped
         started = Time.new
         begin
           yield if block_given?
-          Moped::Loggable.log_operations(payload[:prefix]<<"HI", payload[:ops], runtime(started))
         rescue Exception => e
-          puts 'rescued in instrument'
           payload[:exception] = [ e.class.name, e.message ]
-          Moped::Loggable.warn(payload[:prefix],payload[:exception].join(' '),runtime(started))
-          Moped::Loggable.log_operations(payload[:prefix], payload[:ops], runtime(started))
           raise e
+        ensure
+          runtime = ("%.4fms" % (1000 * (Time.now.to_f - started.to_f)))
+          Moped::Loggable.log_operations(payload[:prefix], payload[:ops], runtime)
         end
-      end
-
-      def runtime(started)
-        ("%.4fms" % (1000 * (Time.now.to_f - started.to_f))) 
       end
     end
   end
