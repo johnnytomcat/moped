@@ -107,12 +107,21 @@ module Moped
     # @example Get the node's connection.
     #   node.connection
     #
+    # @rescue [ Timeout::Error ] When there are no available connections in the queue
+    #
+    # @raise [ PoolSaturated ] Raise the underlying Timeout::Error as PoolSaturated 
+    # with a message to configure pool_size.  
+    #
     # @return [ Connection ] The connection.
     #
     # @since 2.0.0
     def connection
-      pool.with do |conn|
-        yield(conn)
+      begin
+        pool.with do |conn|
+          yield(conn)
+        end
+      rescue Timeout::Error 
+        raise PoolSaturated, "#{$!}. Try increasing your pool_size or pool_timeout." 
       end
     end
 
@@ -185,7 +194,6 @@ module Moped
       ensure
         end_execution(:connection)
       end
-
     end
 
     # Set a flag on the node for the duration of provided block so that an
@@ -427,17 +435,13 @@ module Moped
     # @since 1.0.0
     def refresh
       if address.resolve(self)
-        begin
-          @refreshed_at = Time.now
-          configure(command("admin", ismaster: 1))
-          if !primary? && executing?(:ensure_primary)
-            raise Errors::ReplicaSetReconfigured.new("#{inspect} is no longer the primary node.", {})
-          elsif !messagable?
-            # not primary or secondary so mark it as down, since it's probably
-            # a recovering node withing the replica set
-            down!
-          end
-        rescue Timeout::Error
+        @refreshed_at = Time.now
+        configure(command("admin", ismaster: 1))
+        if !primary? && executing?(:ensure_primary)
+          raise Errors::ReplicaSetReconfigured.new("#{inspect} is no longer the primary node.", {})
+        elsif !messagable?
+          # not primary or secondary so mark it as down, since it's probably
+          # a recovering node withing the replica set
           down!
         end
       end
