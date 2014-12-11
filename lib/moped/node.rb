@@ -121,7 +121,7 @@ module Moped
           yield(conn)
         end
       rescue Timeout::Error 
-        raise PoolSaturated, "#{$!}. Try increasing your pool_size or pool_timeout." 
+        raise Moped::Errors::PoolSaturated, "#{$!}. Try increasing your pool_size or pool_timeout." 
       end
     end
 
