@@ -122,6 +122,12 @@ module Moped
         end
       rescue Timeout::Error 
         raise Errors::PoolSaturated, "#{$!}. Try increasing pool_size or pool_timeout." 
+      
+      # Could possibly rescue this here as it is one of 2 exceptions that connection_pool
+      # will raise, but we already have retry code other places that will wait and hopefully
+      # get a fresh pool if the current one is being shutdown?
+      # rescue ConnectionPool::PoolShuttingDownError
+      
       end
     end
 
@@ -146,7 +152,7 @@ module Moped
     #
     # @since 1.2.0
     def disconnect
-      connection{ |conn| conn.disconnect } if address.resolved
+      Connection::Manager.shutdown_pool(self)
       true
     end
 
@@ -633,7 +639,7 @@ module Moped
     #
     # @since 2.0.0
     def pool
-      @pool ||= Connection::Manager.pool(self)
+      Connection::Manager.pool(self)
     end
 
     # Execute a read operation.

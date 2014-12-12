@@ -35,6 +35,22 @@ module Moped
         end
       end
 
+      def shutdown_pool(node)
+        return if !!@shutting_down
+        MUTEX.synchronize do
+          begin
+            @shutting_down=true      
+            if pools[node.address.resolved]
+              Moped.logger.debug("MOPED: Shutting down connection pool for #{node.inspect}")
+              pools[node.address.resolved].shutdown {|conn| conn.disconnect }
+            end
+          ensure
+            @shutting_down=false
+            pools[node.address.resolved]=nil
+          end 
+        end
+      end
+
       private
 
       # Create a new connection pool for the provided node.
@@ -50,6 +66,8 @@ module Moped
       #
       # @since 2.0.0
       def create_pool(node)
+        Moped.logger.debug("MOPED: Creating new connection pool for #{node.inspect}")        
+
         ConnectionPool.new(
           size: node.options[:pool_size] || POOL_SIZE,
           timeout: node.options[:pool_timeout] || TIMEOUT
