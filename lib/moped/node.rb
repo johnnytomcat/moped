@@ -2,6 +2,7 @@
 require "moped/address"
 require "moped/authenticatable"
 require "moped/connection"
+require "moped/connection/poolable"
 require "moped/executable"
 require "moped/failover"
 require "moped/instrumentable"
@@ -15,6 +16,7 @@ module Moped
   class Node
     include Executable
     include Instrumentable
+    include Connection::Poolable
 
     # @!attribute address
     #   @return [ Address ] The address.
@@ -628,19 +630,6 @@ module Moped
       end
     end
 
-    # Get the connection pool for the node.
-    #
-    # @api private
-    #
-    # @example Get the connection pool.
-    #   node.pool
-    #
-    # @return [ Connection::Pool ] The connection pool.
-    #
-    # @since 2.0.0
-    def pool
-      Connection::Manager.pool(self)
-    end
 
     # Execute a read operation.
     #
