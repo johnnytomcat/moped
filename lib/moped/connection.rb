@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "moped/connection/manager"
 require "moped/connection/sockets"
 
 module Moped

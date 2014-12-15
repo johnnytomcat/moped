@@ -120,6 +120,7 @@ module Moped
     def connection
       begin
         pool.with do |conn|
+          Moped.logger.debug("MOPED: Using connection #{conn} in thread #{Thread.current}")
           yield(conn)
         end
       rescue Timeout::Error 
@@ -154,7 +155,7 @@ module Moped
     #
     # @since 1.2.0
     def disconnect
-      Connection::Manager.shutdown_pool(self)
+      shutdown_pool
       true
     end
 
@@ -271,6 +272,7 @@ module Moped
       @instrumenter = options[:instrumenter] || Instrumentable::Log
       @address = Address.new(address, timeout)
       @address.resolve(self)
+      super
     end
 
     # Insert documents into the database.
@@ -625,7 +627,7 @@ module Moped
     #
     # @since 2.0.0
     def logging(operations)
-      instrument(TOPIC, prefix: "  MOPED: #{address.resolved}", ops: operations) do
+      instrument(TOPIC, prefix: "  MOPED: #{address.resolved} TID-#{Thread.current.object_id.to_s(36)}", ops: operations) do
         yield if block_given?
       end
     end

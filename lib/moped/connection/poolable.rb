@@ -53,7 +53,6 @@ module Moped
       private
 
       def initialize(*args)
-        super
         @mutex = Mutex.new
         @shutdown_mutex = Mutex.new
       end
