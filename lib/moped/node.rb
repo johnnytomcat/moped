@@ -120,8 +120,9 @@ module Moped
     def connection
       begin
         pool.with do |conn|
-          Moped.logger.debug("MOPED: Using connection #{conn} in thread #{Thread.current}")
+          Moped.logger.debug("MOPED: Starting connection #{conn.object_id.to_s(36)} in thread #{Thread.current.to_s(36)}")
           yield(conn)
+          Moped.logger.debug("MOPED: Ending connection #{conn.object_id.to_s(36)} in thread #{Thread.current.to_s(36)}")
         end
       rescue Timeout::Error 
         raise Errors::PoolSaturated, "#{$!}. Try increasing pool_size or pool_timeout." 
