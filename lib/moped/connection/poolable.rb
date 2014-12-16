@@ -30,6 +30,9 @@ module Moped
       end
 
       def shutdown_pool
+        
+        old_pool=nil
+
         @shutdown_mutex.synchronize do 
           return if !!@shutting_down
           Moped.logger.debug("MOPED: Shutting down connection pool for #{self.inspect}")
@@ -55,6 +58,7 @@ module Moped
       def initialize(*args)
         @mutex = Mutex.new
         @shutdown_mutex = Mutex.new
+        @shutting_down = false
       end
 
       # Create a new connection pool for the provided node.
