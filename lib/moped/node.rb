@@ -527,7 +527,7 @@ module Moped
     #
     # @since 1.0.0
     def inspect
-      "<#{self.class.name}:{self.object_id} resolved_address=#{address.resolved.inspect}>"
+      "<#{self.class.name}:#{object_id.to_s(36)} resolved_address=#{address.resolved.inspect}>"
     end
 
     private

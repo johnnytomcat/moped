@@ -114,7 +114,7 @@ module Moped
     #
     # @since 1.0.0
     def inspect
-      "#<#{self.class.name}:#{object_id} @seeds=#{seeds.inspect}>"
+      "#<#{self.class.name}:#{object_id.to_s(36)} @seeds=#{seeds.inspect}>"
     end
 
     # Get the number of times an operation should be retried before raising an
