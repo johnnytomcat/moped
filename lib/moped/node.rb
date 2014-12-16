@@ -170,6 +170,7 @@ module Moped
     # @since 2.0.0
     def down!
       @down_at = Time.new
+      Moped.logger.debug("MOPED: #{inspect} down! at #{@down_at} in thread:#{Thread.current.object_id.to_s(36)}")
       @latency = nil
       disconnect
     end
@@ -526,7 +527,7 @@ module Moped
     #
     # @since 1.0.0
     def inspect
-      "<#{self.class.name} resolved_address=#{address.resolved.inspect}>"
+      "<#{self.class.name}:{self.object_id} resolved_address=#{address.resolved.inspect}>"
     end
 
     private
@@ -628,7 +629,7 @@ module Moped
     #
     # @since 2.0.0
     def logging(operations)
-      instrument(TOPIC, prefix: "  MOPED: #{address.resolved} TID-#{Thread.current.object_id.to_s(36)}", ops: operations) do
+      instrument(TOPIC, prefix: "  MOPED: #{inspect} TID-#{Thread.current.object_id.to_s(36)}", ops: operations) do
         yield if block_given?
       end
     end
