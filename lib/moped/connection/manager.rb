@@ -38,6 +38,7 @@ module Moped
         end
       end
 
+
       # Shut down a pool for a node while immediately clearing
       # the cached pool so a new one can be created by another
       # thread.
@@ -71,6 +72,7 @@ module Moped
           shutting_down[pool_id] = false
         end
         true
+
       end
 
       private

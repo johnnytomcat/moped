@@ -168,9 +168,10 @@ module Moped
     #
     # @since 2.0.0
     def down!
+      @pool = Connection::Manager.shutdown(self)
       @down_at = Time.new
       @latency = nil
-      disconnect
+      true
     end
 
     # Yields the block if a connection can be established, retrying when a
