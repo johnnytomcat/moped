@@ -46,7 +46,7 @@ module Moped
     # @since 2.0.0
     def resolve(node)
       begin
-        return @resolved if @resolved
+        #return @resolved if @resolved
         Timeout::timeout(@timeout) do
           Resolv.each_address(host) do |ip|
             if ip =~ Resolv::IPv4::Regex
