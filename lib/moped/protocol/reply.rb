@@ -68,7 +68,7 @@ module Moped
       # @since 1.2.10
       def command_failure?
         result = documents.first
-        result.nil? || (result["ok"] != 1.0 && result["ok"] != true) || error?
+        (result["ok"] != 1.0 && result["ok"] != true) || error?
       end
 
       # Was the provided cursor id not found on the server?
